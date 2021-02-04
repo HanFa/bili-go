@@ -1,6 +1,8 @@
 {
   "endpoints": {
     "captcha_get_url": "http://passport.bilibili.com/web/captcha/combine?plat=6",
+    "salt_and_rsa_get_url": "http://passport.bilibili.com/login?act=getkey",
+    "login_post_url": "http://passport.bilibili.com/web/login/v2",
     "splash_brand_list_url": "http://app.bilibili.com/x/v2/splash/brand/list",
     "video_view_url": "http://api.bilibili.com/x/web-interface/view",
     "video_desc_url": "http://api.bilibili.com/x/web-interface/archive/desc"

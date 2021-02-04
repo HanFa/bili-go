@@ -1,0 +1,7 @@
+{
+  "endpoints": {
+    "splash_brand_list_url": "http://app.bilibili.com/x/v2/splash/brand/list",
+    "video_view_url": "http://api.bilibili.com/x/web-interface/view",
+    "video_desc_url": "http://api.bilibili.com/x/web-interface/archive/desc"
+  }
+}

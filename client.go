@@ -3,6 +3,7 @@ package bili
 import "errors"
 
 type Client struct {
+	Auth
 	Config
 }
 

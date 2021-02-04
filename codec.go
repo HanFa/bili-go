@@ -6,13 +6,8 @@ import (
 	"net/http"
 )
 
-func HttpGetWithParams(endpoint string, params interface{}) ([]byte, error) {
-	v, err := query.Values(params)
-	if err != nil {
-		return nil, err
-	}
-	url := endpoint + "?" + v.Encode()
-	response, err := http.Get(url)
+func HttpGet(endpoint string) ([]byte, error) {
+	response, err := http.Get(endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -22,4 +17,13 @@ func HttpGetWithParams(endpoint string, params interface{}) ([]byte, error) {
 		return nil, err
 	}
 	return responseBody, err
+}
+
+func HttpGetWithParams(endpoint string, params interface{}) ([]byte, error) {
+	v, err := query.Values(params)
+	if err != nil {
+		return nil, err
+	}
+	url := endpoint + "?" + v.Encode()
+	return HttpGet(url)
 }

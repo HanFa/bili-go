@@ -5,24 +5,17 @@ import (
 	"testing"
 )
 
-var client *Client
-
-func TestMain(m *testing.M) {
-	client, _ = New("./config.json")
-	m.Run()
-}
-
 func TestClient_GetVideoInfoByAid(t *testing.T) {
 	response, err := client.GetVideoInfoByAid(85440373)
 	assert.Nil(t, err, "cannot get video by aid")
-	assert.Equal(t, response.Code, Success, "response doesn't have success code")
+	assert.Equal(t, response.Code, VideoSuccess, "response doesn't have success code")
 	assert.Equal(t, response.Data.Title, "当我给拜年祭的快板加了电音配乐…")
 }
 
 func TestClient_GetVideoInfoByBvid(t *testing.T) {
 	response, err := client.GetVideoInfoByBvid("BV117411r7R1")
 	assert.Nil(t, err, "cannot get video by bvid")
-	assert.Equal(t, response.Code, Success, "response doesn't have success code")
+	assert.Equal(t, response.Code, VideoSuccess, "response doesn't have success code")
 	assert.Equal(t, response.Data.Title, "当我给拜年祭的快板加了电音配乐…")
 }
 

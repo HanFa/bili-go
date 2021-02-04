@@ -15,11 +15,11 @@ type VideoRequestBvid struct {
 type VideoResponseCode int
 
 const (
-	Success      VideoResponseCode = 0
-	BadRequest   VideoResponseCode = -400
-	NoPermission VideoResponseCode = -403
-	NotFound     VideoResponseCode = -404
-	NotVisible   VideoResponseCode = 62002
+	VideoSuccess      VideoResponseCode = 0
+	VideoBadRequest   VideoResponseCode = -400
+	VideoNoPermission VideoResponseCode = -403
+	VideoNotFound     VideoResponseCode = -404
+	VideoNotVisible   VideoResponseCode = 62002
 )
 
 type VideoInfoResponse struct {

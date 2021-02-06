@@ -52,7 +52,7 @@ type VideoDescResponse struct {
 }
 
 func (c *Client) getVideoInfo(request interface{}) (VideoInfoResponse, error) {
-	responseBytes, err := HttpGetWithParams(c.Endpoints.VideoViewUrl, request)
+	responseBytes, err := HttpGetWithParams(c.client, c.Endpoints.VideoViewUrl, request)
 	if err != nil {
 		return VideoInfoResponse{}, err
 	}
@@ -72,7 +72,7 @@ func (c *Client) GetVideoInfoByBvid(bvid string) (VideoInfoResponse, error) {
 }
 
 func (c *Client) getVideoDescription(request interface{}) (VideoDescResponse, error) {
-	responseBytes, err := HttpGetWithParams(c.Endpoints.VideoDescUrl, request)
+	responseBytes, err := HttpGetWithParams(c.client, c.Endpoints.VideoDescUrl, request)
 	if err != nil {
 		return VideoDescResponse{}, err
 	}

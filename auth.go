@@ -10,6 +10,7 @@ import (
 	"encoding/pem"
 	"errors"
 	"log"
+	"net/http"
 	"os"
 	"strings"
 )
@@ -61,10 +62,12 @@ type Auth struct {
 	RSA  string
 
 	Password string
+
+	client *http.Client
 }
 
 func (c *Client) GetCaptcha() (CaptchaGetResponse, error) {
-	responseBytes, err := HttpGet(c.Endpoints.CaptchaGetUrl)
+	responseBytes, err := HttpGet(c.client, c.Endpoints.CaptchaGetUrl)
 	if err != nil {
 		return CaptchaGetResponse{}, err
 	}
@@ -104,7 +107,7 @@ func (c *Client) DoCaptcha() error {
 }
 
 func (c *Client) GetPasswordSaltAndRSA() (SaltAndRsaResponse, error) {
-	responseBytes, err := HttpGet(c.Endpoints.SaltAndRsaGetUrl)
+	responseBytes, err := HttpGet(c.client, c.Endpoints.SaltAndRsaGetUrl)
 	if err != nil {
 		return SaltAndRsaResponse{}, err
 	}
@@ -155,10 +158,9 @@ func (c *Client) Login(username, plain string) error {
 		Seccode:     c.Seccode,
 	}
 
-	responseBytes, err := HttpPostWithParams(c.Endpoints.LoginPostUrl, request)
+	_, _, err = HttpPostWithParams(c.client, c.Endpoints.LoginPostUrl, request)
 	if err != nil {
 		return err
 	}
-	log.Printf("login response: %s\n", responseBytes)
 	return nil
 }

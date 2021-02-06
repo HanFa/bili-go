@@ -21,8 +21,7 @@ func TestClient_GetPasswordSaltAndRSA(t *testing.T) {
 }
 
 func TestClient_EncryptPasswordWithSaltAndRSA(t *testing.T) {
-	password, err := client.EncryptPasswordWithSaltAndRSA(
+	_, err := client.EncryptPasswordWithSaltAndRSA(
 		"BiShi22332323", "8e0db05c46f4052c", "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDjb4V7EidX/ym28t2ybo0U6t0n\n6p4ej8VjqKHg100va6jkNbNTrLQqMCQCAYtXMXXp2Fwkk6WR+12N9zknLjf+C9sx\n/+l48mjUU8RqahiFD1XT/u2e0m2EN029OhCgkHx3Fc/KlFSIbak93EH/XlYis0w+\nXl69GV6klzgxW6d2xQIDAQAB\n-----END PUBLIC KEY-----")
 	assert.Nil(t, err, "cannot encrypt password with salt and rsa")
-	assert.Equal(t, password, "YgpjxAQ22pKa9socHIKPCZX0a/NS6Ng9Zzy+rp16b0LJGT6RHw2ERs3+ijCpG96PKTY1Baavwf0xgotmNvpl25l1KO5y4AjcqeWTzNTSVn6ejonBXGmBMybHHYawJ0aMPn1eDGpKrbI91mrF+h2x+fsnnpuZ1gheiYGzFmtshUc=")
 }

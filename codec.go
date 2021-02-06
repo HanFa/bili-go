@@ -9,8 +9,8 @@ import (
 	"strconv"
 )
 
-func HttpGet(endpoint string) ([]byte, error) {
-	response, err := http.Get(endpoint)
+func HttpGet(client *http.Client, endpoint string) ([]byte, error) {
+	response, err := client.Get(endpoint)
 	if err != nil {
 		return nil, err
 	}
@@ -22,13 +22,13 @@ func HttpGet(endpoint string) ([]byte, error) {
 	return responseBody, err
 }
 
-func HttpGetWithParams(endpoint string, params interface{}) ([]byte, error) {
+func HttpGetWithParams(client *http.Client, endpoint string, params interface{}) ([]byte, error) {
 	v, err := query.Values(params)
 	if err != nil {
 		return nil, err
 	}
 	fullEndpoint := endpoint + "?" + v.Encode()
-	return HttpGet(fullEndpoint)
+	return HttpGet(client, fullEndpoint)
 }
 
 // https://gist.github.com/tonyhb/5819315
@@ -61,19 +61,21 @@ func structToMap(i interface{}) (values url.Values) {
 	return
 }
 
-func HttpPostWithParams(endpoint string, form interface{}) ([]byte, error) {
+func HttpPostWithParams(client *http.Client, endpoint string, form interface{}) ([]byte, []*http.Cookie, error) {
 	v, err := query.Values(form)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	response, err := http.PostForm(endpoint, v)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 	defer response.Body.Close()
 	responseBody, err := ioutil.ReadAll(response.Body)
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
-	return responseBody, err
+	u, _ := url.Parse("http://bilibili.com")
+	client.Jar.SetCookies(u, response.Cookies())
+	return responseBody, response.Cookies(), err
 }

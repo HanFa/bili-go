@@ -7,6 +7,7 @@ import (
 	"net/url"
 	"reflect"
 	"strconv"
+	"strings"
 )
 
 func HttpGet(client *http.Client, endpoint string) ([]byte, error) {
@@ -62,11 +63,23 @@ func structToMap(i interface{}) (values url.Values) {
 }
 
 func HttpPostWithParams(client *http.Client, endpoint string, form interface{}) ([]byte, []*http.Cookie, error) {
+	return HttpPostWithParamsReferer(client, endpoint, form, "")
+}
+
+func HttpPostWithParamsReferer(client *http.Client, endpoint string, form interface{}, referer string) ([]byte, []*http.Cookie, error) {
 	v, err := query.Values(form)
 	if err != nil {
 		return nil, nil, err
 	}
-	response, err := client.PostForm(endpoint, v)
+	request, err := http.NewRequest("POST", endpoint, strings.NewReader(v.Encode()))
+	if err != nil {
+		return nil, nil, err
+	}
+	if len(referer) > 0 {
+		request.Header.Set("Referer", referer)
+	}
+	request.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	response, err := client.Do(request)
 	if err != nil {
 		return nil, nil, err
 	}

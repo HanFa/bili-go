@@ -329,3 +329,98 @@ func (c *Client) CheckVideoHasCoinsByAid(aid int) (VideoHasCoinsResponse, error)
 func (c *Client) CheckVideoHasCoinsByBvid(bvid string) (VideoHasCoinsResponse, error) {
 	return c.checkVideoHasCoins(VideoRequestBvid{Bvid: bvid})
 }
+
+//
+//Change (add/remove) video to/from the favorite list
+//
+
+type VideoChangeFavRequest struct {
+	Aid         int    `url:"rid"`
+	Type        int    `url:"type"`
+	AddMediaIds []int  `url:"add_media_ids"`
+	DelMediaIds []int  `url:"del_media_ids"`
+	Csrf        string `url:"csrf"`
+	Jsonp       string `url:"jsonp"`
+}
+
+type VideoChangeFavResponseCode int
+
+const (
+	VideoChangeFavSuccess        VideoChangeFavResponseCode = 0
+	VideoChangeFavNotLoggedIn    VideoChangeFavResponseCode = -101
+	VideoChangeFavWrongCsrf      VideoChangeFavResponseCode = -111
+	VideoChangeFavBadRequest     VideoChangeFavResponseCode = -400
+	VideoChangeFavNoPermission   VideoChangeFavResponseCode = -403
+	VideoChangeFavVideoNotExists VideoChangeFavResponseCode = 10003
+	VideoChangeFavAlreadyAdded   VideoChangeFavResponseCode = 11201
+	VideoChangeFavReachLimit     VideoChangeFavResponseCode = 11203
+	VideoChangeFavIncorrectArgs  VideoChangeFavResponseCode = 72010017
+)
+
+type VideoChangeFavResponse struct {
+	Code    VideoChangeFavResponseCode `json:"code"`
+	Message string                     `json:"message"`
+	Data    struct {
+		FavByNonFollower bool `json:"prompt"`
+	}
+}
+
+func (c *Client) changeVideoFav(request interface{}) (VideoChangeFavResponse, error) {
+	responseBody, _, err := HttpPostWithParamsReferer(c.client, c.Config.Endpoints.VideoChangeFavUrl, request, "https://www.bilibili.com/")
+	if err != nil {
+		return VideoChangeFavResponse{}, err
+	}
+	response := VideoChangeFavResponse{}
+	if err := json.Unmarshal(responseBody, &response); err != nil {
+		return VideoChangeFavResponse{}, err
+	}
+	return response, nil
+}
+
+func (c *Client) ChangeVideoFavByAid(aid int, addMedias []int, delMedias []int) (VideoChangeFavResponse, error) {
+	csrf, err := c.getCookieValueByName("bili_jct")
+	if err != nil {
+		return VideoChangeFavResponse{}, err
+	}
+	return c.changeVideoFav(VideoChangeFavRequest{
+		Aid:         aid,
+		Type:        2,
+		AddMediaIds: addMedias,
+		DelMediaIds: delMedias,
+		Csrf:        csrf,
+		Jsonp:       "jsonp",
+	})
+}
+
+//
+// Check if the video has been favored or not
+//
+
+type VideoFavoredResponse struct {
+	Code    VideoChangeFavResponseCode `json:"code"`
+	Message string                     `json:"message"`
+	Ttl     int                        `json:"ttl"`
+	Data    struct {
+		Favoured bool `json:"favoured"`
+	} `json:"data"`
+}
+
+func (c *Client) checkVideoFavored(request interface{}) (VideoFavoredResponse, error) {
+	responseBody, err := HttpGetWithParams(c.client, c.Config.Endpoints.VideoCheckHasCoinUrl, request)
+	if err != nil {
+		return VideoFavoredResponse{}, err
+	}
+	response := VideoFavoredResponse{}
+	if err := json.Unmarshal(responseBody, &response); err != nil {
+		return VideoFavoredResponse{}, err
+	}
+	return response, nil
+}
+
+func (c *Client) CheckVideoFavoredByAid(aid int) (VideoFavoredResponse, error) {
+	return c.checkVideoFavored(VideoRequestAid{Aid: aid})
+}
+
+func (c *Client) CheckVideoFavoredByBvid(bvid string) (VideoFavoredResponse, error) {
+	return c.checkVideoFavored(VideoRequestBvid{Bvid: bvid})
+}

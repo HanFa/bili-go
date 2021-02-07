@@ -78,3 +78,21 @@ func TestClient_CheckVideoHasCoinsByBvid_NotLoggedIn(t *testing.T) {
 	assert.Nil(t, err, "cannot check video like")
 	assert.Equal(t, response.Code, VideoAddCoinNotLoggedIn)
 }
+
+func TestClient_ChangeVideoFavByAid_NotLoggedIn(t *testing.T) {
+	response, err := client.ChangeVideoFavByAid(671597785, []int{180320832}, []int{})
+	assert.Nil(t, err, "cannot change fav for video")
+	assert.Equal(t, response.Code, VideoChangeFavNotLoggedIn)
+}
+
+func TestClient_CheckVideoFavoredByAid_NotLoggedIn(t *testing.T) {
+	response, err := client.CheckVideoFavoredByAid(671597785)
+	assert.Nil(t, err, "cannot check video fav")
+	assert.Equal(t, response.Code, VideoChangeFavNotLoggedIn)
+}
+
+func TestClient_CheckVideoFavoredByBvid_NotLoggedIn(t *testing.T) {
+	response, err := client.CheckVideoFavoredByBvid("BV1bU4y1x7A1")
+	assert.Nil(t, err, "cannot check video fav")
+	assert.Equal(t, response.Code, VideoChangeFavNotLoggedIn)
+}

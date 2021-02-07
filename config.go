@@ -17,6 +17,7 @@ type Config struct {
 		VideoDescUrl       string `json:"video_desc_url"`
 		VideoLikeUrl       string `json:"video_like_url"`
 		VideoCheckLikeUrl  string `json:"video_check_like_url"`
+		VideoAddCoinUrl    string `json:"video_add_coin_url"`
 	} `json:"endpoints"`
 }
 

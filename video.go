@@ -209,3 +209,90 @@ func (c *Client) CheckVideoLikeByAid(aid int) (VideoHasLikeResponse, error) {
 func (c *Client) CheckVideoLikeByBvid(bvid string) (VideoHasLikeResponse, error) {
 	return c.checkVideoLike(VideoRequestBvid{Bvid: bvid})
 }
+
+//
+//Add coin to the video
+//
+
+type VideoAddCoinRequestAid struct {
+	Aid        int    `url:"aid"`
+	Multiply   int    `url:"multiply"`
+	SelectLike int    `url:"select_like"`
+	Csrf       string `url:"csrf"`
+}
+
+type VideoAddCoinRequestBvid struct {
+	Bvid       string `url:"bvid"`
+	Multiply   int    `url:"multiply"`
+	SelectLike int    `url:"select_like"`
+	Csrf       string `url:"csrf"`
+}
+
+type VideoAddCoinResponseCode int
+
+const (
+	VideoAddCoinSuccess           VideoAddCoinResponseCode = 0
+	VideoAddCoinNotLoggedIn       VideoAddCoinResponseCode = -101
+	VideoAddCoinAccountBanned     VideoAddCoinResponseCode = -102
+	VideoAddCoinInsufficientCoin  VideoAddCoinResponseCode = -104
+	VideoAddCoinWrongCSRF         VideoAddCoinResponseCode = -111
+	VideoAddCoinBadRequest        VideoAddCoinResponseCode = -400
+	VideoAddCoinVideoNotExists    VideoAddCoinResponseCode = 10003
+	VideoAddCoinCannotToYourself  VideoAddCoinResponseCode = 34002
+	VideoAddCoinInvalidMultiplier VideoAddCoinResponseCode = 34003
+	VideoAddCoinIntervalToShort   VideoAddCoinResponseCode = 34004
+	VideoAddCoinBeyondLimit       VideoAddCoinResponseCode = 34005
+)
+
+type VideoAddCoinResponse struct {
+	Code    VideoAddCoinResponseCode `json:"code"`
+	Message string                   `json:"message"`
+	Ttl     int                      `json:"ttl"`
+	Data    interface{}              `json:"data"`
+}
+
+func (c *Client) addCoinToVideo(request interface{}) (VideoAddCoinResponse, error) {
+	responseBody, _, err := HttpPostWithParams(c.client, c.Config.Endpoints.VideoAddCoinUrl, request)
+	if err != nil {
+		return VideoAddCoinResponse{}, err
+	}
+	response := VideoAddCoinResponse{}
+	if err := json.Unmarshal(responseBody, &response); err != nil {
+		return VideoAddCoinResponse{}, err
+	}
+	return response, nil
+}
+
+func (c *Client) AddCoinToVideoByAid(aid int, multiply int, likeAsWell bool) (VideoAddCoinResponse, error) {
+	selectLike := 0
+	if likeAsWell {
+		selectLike = 1
+	}
+	csrf, err := c.getCookieValueByName("bili_jct")
+	if err != nil {
+		return VideoAddCoinResponse{}, err
+	}
+	return c.addCoinToVideo(VideoAddCoinRequestAid{
+		Aid:        aid,
+		Multiply:   multiply,
+		SelectLike: selectLike,
+		Csrf:       csrf,
+	})
+}
+
+func (c *Client) AddCoinToVideoByBvid(bvid string, multiply int, likeAsWell bool) (VideoAddCoinResponse, error) {
+	selectLike := 0
+	if likeAsWell {
+		selectLike = 1
+	}
+	csrf, err := c.getCookieValueByName("bili_jct")
+	if err != nil {
+		return VideoAddCoinResponse{}, err
+	}
+	return c.addCoinToVideo(VideoAddCoinRequestBvid{
+		Bvid:       bvid,
+		Multiply:   multiply,
+		SelectLike: selectLike,
+		Csrf:       csrf,
+	})
+}

@@ -8,6 +8,7 @@
     "video_view_url": "http://api.bilibili.com/x/web-interface/view",
     "video_desc_url": "http://api.bilibili.com/x/web-interface/archive/desc",
     "video_like_url": "http://api.bilibili.com/x/web-interface/archive/like",
-    "video_check_like_url": "http://api.bilibili.com/x/web-interface/archive/has/like"
+    "video_check_like_url": "http://api.bilibili.com/x/web-interface/archive/has/like",
+    "video_add_coin_url": "http://api.bilibili.com/x/web-interface/coin/add"
   }
 }

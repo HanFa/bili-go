@@ -17,17 +17,9 @@ func main() {
 	if resp.Code != bili.LoginSuccess {
 		log.Fatalln("Cannot login: " + resp.Message)
 	}
-	_, err = client.LikeVideoByBvid("BV1bU4y1x7A1", bili.VideoLike) // like
+	addCoinResp, err := client.AddCoinToVideoByBvid("BV1bU4y1x7A1", 1, true)
 	if err != nil {
-		log.Fatalln("Error when liking: " + err.Error())
+		log.Fatalln("Error when adding coin: " + err.Error())
 	}
-	checkLikeResponse, err := client.CheckVideoLikeByBvid("BV1bU4y1x7A1") // check like
-	if err != nil {
-		log.Fatalln("Error when check like status: " + err.Error())
-	}
-	if checkLikeResponse.Data == bili.Liked {
-		log.Println("As expected, you have liked this video")
-	} else {
-		log.Fatalln("What??")
-	}
+	log.Println(addCoinResp)
 }

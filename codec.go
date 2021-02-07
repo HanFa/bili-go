@@ -66,7 +66,7 @@ func HttpPostWithParams(client *http.Client, endpoint string, form interface{}) 
 	if err != nil {
 		return nil, nil, err
 	}
-	response, err := http.PostForm(endpoint, v)
+	response, err := client.PostForm(endpoint, v)
 	if err != nil {
 		return nil, nil, err
 	}

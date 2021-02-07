@@ -4,6 +4,10 @@ import (
 	"encoding/json"
 )
 
+//
+//Get video information and description
+//
+
 type VideoRequestAid struct {
 	Aid int `url:"aid"`
 }
@@ -89,4 +93,119 @@ func (c *Client) GetVideoDescriptionByAid(aid int) (VideoDescResponse, error) {
 
 func (c *Client) GetVideoDescriptionByBvid(bvid string) (VideoDescResponse, error) {
 	return c.getVideoDescription(VideoRequestBvid{Bvid: bvid})
+}
+
+//
+//Like/Unlike a video
+//
+
+type LikeUnlikeOpCode int
+
+const (
+	VideoLike   LikeUnlikeOpCode = 1
+	VideoUnlike LikeUnlikeOpCode = 2
+)
+
+type VideoLikeRequestAid struct {
+	Aid  int              `url:"aid"`
+	Like LikeUnlikeOpCode `url:"like"`
+	Csrf string           `url:"csrf"`
+}
+
+type VideoLikeRequestBvid struct {
+	Bvid string           `url:"bvid"`
+	Like LikeUnlikeOpCode `url:"like"`
+	Csrf string           `url:"csrf"`
+}
+
+type VideoLikeResponseCode int
+
+const (
+	VideoLikeSuccess        VideoLikeResponseCode = 0
+	VideoLikeNotLoggedIn    VideoLikeResponseCode = -101
+	VideoLikeWrongCSRF      VideoLikeResponseCode = -111
+	VideoLikeBadRequest     VideoLikeResponseCode = -400
+	VideoLikeVideoNotExists VideoLikeResponseCode = 10003
+	VideoLikeCannotUnlike   VideoLikeResponseCode = 65004
+	VideoLikeDuplicateLikes VideoLikeResponseCode = 65006
+)
+
+type VideoLikeResponse struct {
+	Code    VideoLikeResponseCode `json:"code"`
+	Message string                `json:"message"`
+	Ttl     int                   `json:"ttl"`
+}
+
+func (c *Client) likeVideo(request interface{}) (VideoLikeResponse, error) {
+	responseBody, _, err := HttpPostWithParams(c.client, c.Config.Endpoints.VideoLikeUrl, request)
+	if err != nil {
+		return VideoLikeResponse{}, err
+	}
+	response := VideoLikeResponse{}
+	if err := json.Unmarshal(responseBody, &response); err != nil {
+		return VideoLikeResponse{}, err
+	}
+	return response, nil
+}
+
+func (c *Client) LikeVideoByAid(aid int, like LikeUnlikeOpCode) (VideoLikeResponse, error) {
+	csrf, err := c.getCookieValueByName("bili_jct")
+	if err != nil {
+		return VideoLikeResponse{}, err
+	}
+	return c.likeVideo(VideoLikeRequestAid{
+		Aid:  aid,
+		Like: like,
+		Csrf: csrf,
+	})
+}
+
+func (c *Client) LikeVideoByBvid(bvid string, like LikeUnlikeOpCode) (VideoLikeResponse, error) {
+	csrf, err := c.getCookieValueByName("bili_jct")
+	if err != nil {
+		return VideoLikeResponse{}, err
+	}
+	return c.likeVideo(VideoLikeRequestBvid{
+		Bvid: bvid,
+		Like: like,
+		Csrf: csrf,
+	})
+}
+
+//
+//Check a video has like or not
+//
+
+type LikeUnlikeStatusCode int
+
+const (
+	UnLiked LikeUnlikeStatusCode = 0
+	Liked   LikeUnlikeStatusCode = 1
+)
+
+type VideoHasLikeResponse struct {
+	Code    VideoLikeResponseCode `json:"code"`
+	Message string                `json:"message"`
+	Ttl     int                   `json:"ttl"`
+	Data    LikeUnlikeStatusCode  `json:"data"`
+}
+
+func (c *Client) checkVideoLike(request interface{}) (VideoHasLikeResponse, error) {
+	responseBody, err := HttpGetWithParams(c.client, c.Config.Endpoints.VideoCheckLikeUrl, request)
+	if err != nil {
+		return VideoHasLikeResponse{}, err
+	}
+	response := VideoHasLikeResponse{}
+	if err := json.Unmarshal(responseBody, &response); err != nil {
+		return VideoHasLikeResponse{}, err
+	}
+	return response, nil
+}
+
+func (c *Client) CheckVideoLikeByAid(aid int) (VideoHasLikeResponse, error) {
+	return c.checkVideoLike(VideoRequestAid{Aid: aid})
+}
+
+func (c *Client) CheckVideoLikeByBvid(bvid string) (VideoHasLikeResponse, error) {
+	return c.checkVideoLike(VideoRequestBvid{Bvid: bvid})
 }

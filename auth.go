@@ -50,6 +50,27 @@ type LoginRequest struct {
 	Seccode     string `url:"seccode"`
 }
 
+type LoginResponseCode int
+
+const (
+	LoginSuccess                 LoginResponseCode = 0
+	LoginBadRequest              LoginResponseCode = -400
+	LoginWrongUsernameOrPassword LoginResponseCode = -629
+	LoginEmptyUsernameOrPassword LoginResponseCode = -653
+	LoginTimeout                 LoginResponseCode = -662
+	LoginFieldMissing            LoginResponseCode = -2001
+	LoginPhoneNumOrEmailNeeded   LoginResponseCode = -2100
+	LoginWrongPrivateKey         LoginResponseCode = 2400
+	LoginWrongGeeTest            LoginResponseCode = 2406
+)
+
+type LoginResponse struct {
+	Code    LoginResponseCode `json:"code"`
+	Ts      int               `json:"ts"`
+	Message string            `json:"message"`
+	Data    interface{}       `json:"data"`
+}
+
 type Auth struct {
 	Gt        string
 	Challenge string
@@ -60,8 +81,6 @@ type Auth struct {
 
 	Hash string
 	RSA  string
-
-	Password string
 
 	client *http.Client
 }
@@ -132,19 +151,19 @@ func (c *Client) EncryptPasswordWithSaltAndRSA(plain, hash, key string) (string,
 	return base64.StdEncoding.EncodeToString(password), err
 }
 
-func (c *Client) Login(username, plain string) error {
+func (c *Client) Login(username, plain string) (LoginResponse, error) {
 	err := c.DoCaptcha()
 	if err != nil {
-		return errors.New("Error when doing captcha: " + err.Error())
+		return LoginResponse{}, errors.New("Error when doing captcha: " + err.Error())
 	}
 	response, err := c.GetPasswordSaltAndRSA()
 	if err != nil {
-		return errors.New("Error when fetching salt and RSA pubkey:" + err.Error())
+		return LoginResponse{}, errors.New("Error when fetching salt and RSA pubkey:" + err.Error())
 	}
 	c.Hash, c.RSA = response.Hash, response.Key
 	password, err := c.EncryptPasswordWithSaltAndRSA(plain, c.Hash, c.RSA)
 	if err != nil {
-		return errors.New("Error when encrypting password with salt and rsa: " + err.Error())
+		return LoginResponse{}, errors.New("Error when encrypting password with salt and rsa: " + err.Error())
 	}
 
 	request := LoginRequest{
@@ -158,9 +177,15 @@ func (c *Client) Login(username, plain string) error {
 		Seccode:     c.Seccode,
 	}
 
-	_, _, err = HttpPostWithParams(c.client, c.Endpoints.LoginPostUrl, request)
+	responseBytes, _, err := HttpPostWithParams(c.client, c.Endpoints.LoginPostUrl, request)
 	if err != nil {
-		return err
+		return LoginResponse{}, err
 	}
-	return nil
+
+	loginResponse := LoginResponse{}
+	if err = json.Unmarshal(responseBytes, &loginResponse); err != nil {
+		return LoginResponse{}, err
+	}
+
+	return loginResponse, nil
 }

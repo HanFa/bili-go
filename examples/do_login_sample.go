@@ -10,8 +10,11 @@ func main() {
 	if err != nil {
 		log.Fatalln("Cannot new a bili-client: " + err.Error())
 	}
-	err = client.Login("13262272815", "han5fang1")
+	resp, err := client.Login("username", "password")
 	if err != nil {
 		log.Fatalln("Error when doing login with password " + err.Error())
+	}
+	if resp.Code != bili.LoginSuccess {
+		log.Fatalln("Cannot login: " + resp.Message)
 	}
 }

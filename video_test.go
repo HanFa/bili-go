@@ -54,3 +54,27 @@ func TestClient_CheckVideoLikeByBvid_NotLoggedIn(t *testing.T) {
 	assert.Nil(t, err, "cannot check video like")
 	assert.Equal(t, response.Code, VideoLikeNotLoggedIn)
 }
+
+func TestClient_AddCoinToVideoByAid_NotLoggedIn(t *testing.T) {
+	response, err := client.AddCoinToVideoByAid(82887239, 1, true)
+	assert.Nil(t, err, "cannot add coins to video")
+	assert.Equal(t, response.Code, VideoAddCoinNotLoggedIn)
+}
+
+func TestClient_AddCoinToVideoByBvid_NotLoggedIn(t *testing.T) {
+	response, err := client.AddCoinToVideoByBvid("BV1bU4y1x7A1", 1, true)
+	assert.Nil(t, err, "cannot add coins to video")
+	assert.Equal(t, response.Code, VideoAddCoinNotLoggedIn)
+}
+
+func TestClient_CheckVideoHasCoinsByAid_NotLoggedIn(t *testing.T) {
+	response, err := client.CheckVideoHasCoinsByAid(82887239)
+	assert.Nil(t, err, "cannot check video like")
+	assert.Equal(t, response.Code, VideoAddCoinNotLoggedIn)
+}
+
+func TestClient_CheckVideoHasCoinsByBvid_NotLoggedIn(t *testing.T) {
+	response, err := client.CheckVideoHasCoinsByBvid("BV1bU4y1x7A1")
+	assert.Nil(t, err, "cannot check video like")
+	assert.Equal(t, response.Code, VideoAddCoinNotLoggedIn)
+}

@@ -296,3 +296,36 @@ func (c *Client) AddCoinToVideoByBvid(bvid string, multiply int, likeAsWell bool
 		Csrf:       csrf,
 	})
 }
+
+//
+//Check a video has received coins from you or not
+//
+
+type VideoHasCoinsResponse struct {
+	Code    VideoAddCoinResponseCode `json:"code"`
+	Message string                   `json:"message"`
+	Ttl     int                      `json:"ttl"`
+	Data    struct {
+		Multiply int `json:"multiply"`
+	} `json:"data"`
+}
+
+func (c *Client) checkVideoHasCoins(request interface{}) (VideoHasCoinsResponse, error) {
+	responseBody, err := HttpGetWithParams(c.client, c.Config.Endpoints.VideoCheckHasCoinUrl, request)
+	if err != nil {
+		return VideoHasCoinsResponse{}, err
+	}
+	response := VideoHasCoinsResponse{}
+	if err := json.Unmarshal(responseBody, &response); err != nil {
+		return VideoHasCoinsResponse{}, err
+	}
+	return response, nil
+}
+
+func (c *Client) CheckVideoHasCoinsByAid(aid int) (VideoHasCoinsResponse, error) {
+	return c.checkVideoHasCoins(VideoRequestAid{Aid: aid})
+}
+
+func (c *Client) CheckVideoHasCoinsByBvid(bvid string) (VideoHasCoinsResponse, error) {
+	return c.checkVideoHasCoins(VideoRequestBvid{Bvid: bvid})
+}

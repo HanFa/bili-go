@@ -31,5 +31,4 @@ func TestClient_GetStreamUrlAvid_Dash(t *testing.T) {
 	assert.Nil(t, err, "Error occurs when fetching streaming url")
 	assert.Greater(t, len(resp.Data.Dash.Video), 0, "No video stream")
 	assert.Greater(t, len(resp.Data.Dash.Audio), 0, "No audio stream")
-
 }

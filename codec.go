@@ -1,14 +1,31 @@
 package bili
 
 import (
-	"github.com/google/go-querystring/query"
+	"errors"
+	"fmt"
+	"io"
 	"io/ioutil"
 	"net/http"
 	"net/url"
+	"os"
 	"reflect"
 	"strconv"
 	"strings"
+
+	"github.com/cheggaaa/pb/v3"
+	"github.com/google/go-querystring/query"
 )
+
+type progress struct {
+	enabled bool
+	bar     *pb.ProgressBar
+}
+
+func (p *progress) Write(ch []byte) (n int, err error) {
+	n = len(ch)
+	p.bar.Add(n)
+	return n, nil
+}
 
 func HttpGet(client *http.Client, endpoint string) ([]byte, error) {
 	response, err := client.Get(endpoint)
@@ -21,6 +38,32 @@ func HttpGet(client *http.Client, endpoint string) ([]byte, error) {
 		return nil, err
 	}
 	return responseBody, err
+}
+
+func HttpGetAsFile(client *http.Client, endpoint string, path string, showProgress bool) error {
+	tmpPath := fmt.Sprintf("%s.tmp", path)
+	out, err := os.Create(tmpPath)
+	if err != nil {
+		return err
+	}
+	response, err := client.Get(endpoint)
+	if err != nil {
+		return err
+	}
+	defer response.Body.Close()
+	if response.StatusCode != http.StatusOK {
+		return errors.New("get response does not return 200")
+	}
+	progressBar := progress{showProgress, pb.StartNew(int(response.ContentLength))}
+	_, err = io.Copy(out, io.TeeReader(response.Body, &progressBar))
+	progressBar.bar.Finish()
+	if err != nil {
+		return err
+	}
+	if err = os.Rename(tmpPath, path); err != nil {
+		return err
+	}
+	return nil
 }
 
 func HttpGetWithParams(client *http.Client, endpoint string, params interface{}) ([]byte, error) {

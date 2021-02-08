@@ -26,25 +26,94 @@ const (
 	VideoNotVisible   VideoResponseCode = 62002
 )
 
+type VideoState int
+type VideoDimension struct {
+	Width  int `json:"width"`
+	Height int `json:"height"`
+	Rotate int `json:"rotate"`
+}
+
 type VideoInfoResponse struct {
 	Code    VideoResponseCode `json:"code"`
 	Message string            `json:"message"`
 	Ttl     int               `json:"ttl"`
 	Data    struct {
-		Bvid      string `json:"bvid"`
-		Aid       int    `json:"aid"`
-		Videos    int    `json:"videos"`
-		Tid       int    `json:"tid"`
-		Tname     string `json:"tname"`
-		Copyright int    `json:"copyright"`
-		Pic       string `json:"pic"`
-		Title     string `json:"title"`
-		Pubdate   int    `json:"pubdate"`
-		Ctime     int    `json:"ctime"`
-		Desc      string `json:"desc"`
-		State     int    `json:"state"`
-		Attribute int    `json:"attribute"`
-		Duration  int    `json:"duration"`
+		Bvid        string     `json:"bvid"`
+		Aid         int        `json:"aid"`
+		Videos      int        `json:"videos"`
+		Tid         int        `json:"tid"`
+		Tname       string     `json:"tname"`
+		Copyright   int        `json:"copyright"`
+		Pic         string     `json:"pic"`
+		Title       string     `json:"title"`
+		Pubdate     int        `json:"pubdate"`
+		Ctime       int        `json:"ctime"`
+		Desc        string     `json:"desc"`
+		State       VideoState `json:"state"`
+		Attribute   int        `json:"attribute"`
+		Duration    int        `json:"duration"`
+		Forward     int        `json:"forward"`
+		MissionId   int        `json:"mission_id"`
+		RedirectUrl string     `json:"redirect_url"`
+		Rights      struct {
+			Bp            int `json:"bp"`
+			Elec          int `json:"elec"`
+			Download      int `json:"download"`
+			Movie         int `json:"movie"`
+			Pay           int `json:"pay"`
+			Hd5           int `json:"hd5"`
+			NoReprint     int `json:"no_reprint"`
+			Autoplay      int `json:"autoplay"`
+			UcgPlay       int `json:"ucg_play"`
+			IsCooperation int `json:"is_cooperation"`
+			UgcPayPreview int `json:"ugc_pay_preview"`
+			NoBackground  int `json:"no_background"`
+		} `json:"rights"`
+		Owner struct {
+			Mid  int    `json:"mid"`
+			Name string `json:"name"`
+			Face string `json:"face"`
+		} `json:"owner"`
+		Stat struct {
+			Aid        int    `json:"aid"`
+			View       int    `json:"view"`
+			Danmaku    int    `json:"danmaku"`
+			Reply      int    `json:"reply"`
+			Favorite   int    `json:"favorite"`
+			Coin       int    `json:"coin"`
+			Share      int    `json:"share"`
+			NowRank    int    `json:"now_rank"`
+			HisRank    int    `json:"his_rank"`
+			Like       int    `json:"like"`
+			Dislike    int    `json:"dislike"`
+			Evaluation string `json:"evaluation"`
+		} `json:"stat"`
+		Dynamic   string         `json:"dynamic"`
+		Cid       int            `json:"cid"`
+		Dimension VideoDimension `json:"dimension"`
+		NoCache   bool           `json:"no_cache"`
+		Pages     []struct {
+			Cid       int            `json:"cid"`
+			Page      int            `json:"page"`
+			From      string         `json:"from"`
+			Part      string         `json:"part"`
+			Duration  int            `json:"duration"`
+			Vid       string         `json:"vid"`
+			Weblink   string         `json:"weblink"`
+			Dimension VideoDimension `json:"dimension"`
+		} `json:"pages"`
+		Subtitle struct {
+			AllowSubmit bool `json:"allow_submit"`
+			List        []struct {
+				Id          int    `json:"id"`
+				Lan         string `json:"lan"`
+				LanDoc      string `json:"lan_doc"`
+				IsLock      bool   `json:"is_lock"`
+				AuthorMid   int    `json:"author_mid"`
+				SubtitleUrl string `json:"subtitle_url"`
+			} `json:"list"`
+		} `json:"subtitle"`
+		Staff []struct{} `json:"staff"`
 	} `json:"data"`
 }
 

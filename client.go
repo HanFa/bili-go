@@ -9,6 +9,7 @@ import (
 type Client struct {
 	Auth
 	Config
+	Zone
 }
 
 func New(config string) (client *Client, err error) {

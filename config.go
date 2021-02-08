@@ -20,6 +20,7 @@ type Config struct {
 		VideoAddCoinUrl      string `json:"video_add_coin_url"`
 		VideoCheckHasCoinUrl string `json:"video_check_has_coin_url"`
 		VideoChangeFavUrl    string `json:"video_change_fav_url"`
+		StreamGetUrl         string `json:"stream_get_url"`
 	} `json:"endpoints"`
 }
 

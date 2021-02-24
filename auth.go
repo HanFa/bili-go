@@ -9,8 +9,10 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
+	cookiejar "github.com/juju/persistent-cookiejar"
 	"log"
 	"net/http"
+	"net/url"
 	"os"
 	"strings"
 )
@@ -151,7 +153,48 @@ func (c *Client) EncryptPasswordWithSaltAndRSA(plain, hash, key string) (string,
 	return base64.StdEncoding.EncodeToString(password), err
 }
 
+func (c *Client) IsSessionValid() (valid bool) {
+	u, _ := url.Parse("http://bilibili.com")
+	cookies := c.client.Jar.Cookies(u) // select all unexpired cookies
+	if len(cookies) < 5 {
+		return false
+	}
+	return true
+}
+
+func (c *Client) ClearSession() error {
+
+	cookiesPath := ""
+	if c.Config.Cookies == "" {
+		cookiesPath = cookiejar.DefaultCookieFile()
+	} else {
+		cookiesPath = c.Config.Cookies
+	}
+
+	if err := os.Remove(cookiesPath); err != nil {
+		return err
+	}
+
+	c.client.Jar, _ = cookiejar.New(nil)
+	if err := c.client.Jar.(*cookiejar.Jar).Save(); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (c *Client) Login(username, plain string) (LoginResponse, error) {
+	if !c.IsSessionValid() {
+		return c.DoLogin(username, plain)
+	}
+	return LoginResponse{
+		Code:    LoginSuccess,
+		Ts:      0,
+		Message: "successfully used cookies to authenticate",
+		Data:    nil,
+	}, nil
+}
+
+func (c *Client) DoLogin(username, plain string) (LoginResponse, error) {
 	err := c.DoCaptcha()
 	if err != nil {
 		return LoginResponse{}, errors.New("Error when doing captcha: " + err.Error())

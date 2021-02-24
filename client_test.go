@@ -9,6 +9,7 @@ var client *Client
 
 func TestMain(m *testing.M) {
 	client, _ = New("./config.json")
+	_ = client.ClearSession()
 	m.Run()
 }
 

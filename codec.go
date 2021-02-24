@@ -3,8 +3,10 @@ package bili
 import (
 	"errors"
 	"fmt"
+	cookiejar "github.com/juju/persistent-cookiejar"
 	"io"
 	"io/ioutil"
+	"log"
 	"net/http"
 	"net/url"
 	"os"
@@ -133,5 +135,8 @@ func HttpPostWithParamsReferer(client *http.Client, endpoint string, form interf
 	}
 	u, _ := url.Parse("http://bilibili.com")
 	client.Jar.SetCookies(u, response.Cookies())
+	if err := client.Jar.(*cookiejar.Jar).Save(); err != nil {
+		log.Printf("HttpPostWithParamsReferer: cannot save cookie %v\n", err)
+	}
 	return responseBody, response.Cookies(), err
 }

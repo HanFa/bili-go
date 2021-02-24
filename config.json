@@ -1,4 +1,5 @@
 {
+  "cookies": "./.bili-cookies",
   "endpoints": {
     "base_url": "http://bilibili.com",
     "captcha_get_url": "http://passport.bilibili.com/web/captcha/combine?plat=6",

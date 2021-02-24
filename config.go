@@ -7,6 +7,7 @@ import (
 )
 
 type Config struct {
+	Cookies   string `json:"cookies"`
 	Endpoints struct {
 		BaseUrl              string `json:"base_url"`
 		CaptchaGetUrl        string `json:"captcha_get_url"`

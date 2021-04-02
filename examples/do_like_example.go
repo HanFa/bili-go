@@ -1,12 +1,12 @@
 package main
 
 import (
-	"bili"
+	"github.com/hanfa/bili-go"
 	"log"
 )
 
 func main() {
-	client, err := bili.New("config.json")
+	client, err := bili.New()
 	if err != nil {
 		log.Fatalln("Cannot new a bili-client: " + err.Error())
 	}

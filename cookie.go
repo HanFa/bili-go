@@ -5,7 +5,7 @@ import (
 )
 
 func (c *Client) getCookieValueByName(name string) (string, error) {
-	u, err := url.Parse(c.Endpoints.BaseUrl)
+	u, err := url.Parse(c.config.Endpoints.BaseUrl)
 	if err != nil {
 		return "", err
 	}

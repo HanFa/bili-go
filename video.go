@@ -125,7 +125,7 @@ type VideoDescResponse struct {
 }
 
 func (c *Client) getVideoInfo(request interface{}) (VideoInfoResponse, error) {
-	responseBytes, err := HttpGetWithParams(c.client, c.Endpoints.VideoViewUrl, request)
+	responseBytes, err := HttpGetWithParams(c.client, c.config.Endpoints.VideoViewUrl, request)
 	if err != nil {
 		return VideoInfoResponse{}, err
 	}
@@ -145,7 +145,7 @@ func (c *Client) GetVideoInfoByBvid(bvid string) (VideoInfoResponse, error) {
 }
 
 func (c *Client) getVideoDescription(request interface{}) (VideoDescResponse, error) {
-	responseBytes, err := HttpGetWithParams(c.client, c.Endpoints.VideoDescUrl, request)
+	responseBytes, err := HttpGetWithParams(c.client, c.config.Endpoints.VideoDescUrl, request)
 	if err != nil {
 		return VideoDescResponse{}, err
 	}
@@ -206,7 +206,7 @@ type VideoLikeResponse struct {
 }
 
 func (c *Client) likeVideo(request interface{}) (VideoLikeResponse, error) {
-	responseBody, _, err := HttpPostWithParams(c.client, c.Config.Endpoints.VideoLikeUrl, request)
+	responseBody, _, err := HttpPostWithParams(c.client, c.config.Endpoints.VideoLikeUrl, request)
 	if err != nil {
 		return VideoLikeResponse{}, err
 	}
@@ -260,7 +260,7 @@ type VideoHasLikeResponse struct {
 }
 
 func (c *Client) checkVideoLike(request interface{}) (VideoHasLikeResponse, error) {
-	responseBody, err := HttpGetWithParams(c.client, c.Config.Endpoints.VideoCheckLikeUrl, request)
+	responseBody, err := HttpGetWithParams(c.client, c.config.Endpoints.VideoCheckLikeUrl, request)
 	if err != nil {
 		return VideoHasLikeResponse{}, err
 	}
@@ -321,7 +321,7 @@ type VideoAddCoinResponse struct {
 }
 
 func (c *Client) addCoinToVideo(request interface{}) (VideoAddCoinResponse, error) {
-	responseBody, _, err := HttpPostWithParams(c.client, c.Config.Endpoints.VideoAddCoinUrl, request)
+	responseBody, _, err := HttpPostWithParams(c.client, c.config.Endpoints.VideoAddCoinUrl, request)
 	if err != nil {
 		return VideoAddCoinResponse{}, err
 	}
@@ -380,7 +380,7 @@ type VideoHasCoinsResponse struct {
 }
 
 func (c *Client) checkVideoHasCoins(request interface{}) (VideoHasCoinsResponse, error) {
-	responseBody, err := HttpGetWithParams(c.client, c.Config.Endpoints.VideoCheckHasCoinUrl, request)
+	responseBody, err := HttpGetWithParams(c.client, c.config.Endpoints.VideoCheckHasCoinUrl, request)
 	if err != nil {
 		return VideoHasCoinsResponse{}, err
 	}
@@ -435,7 +435,7 @@ type VideoChangeFavResponse struct {
 }
 
 func (c *Client) changeVideoFav(request interface{}) (VideoChangeFavResponse, error) {
-	responseBody, _, err := HttpPostWithParamsReferer(c.client, c.Config.Endpoints.VideoChangeFavUrl, request, "https://www.bilibili.com/")
+	responseBody, _, err := HttpPostWithParamsReferer(c.client, c.config.Endpoints.VideoChangeFavUrl, request, "https://www.bilibili.com/")
 	if err != nil {
 		return VideoChangeFavResponse{}, err
 	}
@@ -475,7 +475,7 @@ type VideoFavoredResponse struct {
 }
 
 func (c *Client) checkVideoFavored(request interface{}) (VideoFavoredResponse, error) {
-	responseBody, err := HttpGetWithParams(c.client, c.Config.Endpoints.VideoCheckHasCoinUrl, request)
+	responseBody, err := HttpGetWithParams(c.client, c.config.Endpoints.VideoCheckHasCoinUrl, request)
 	if err != nil {
 		return VideoFavoredResponse{}, err
 	}

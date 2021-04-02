@@ -8,22 +8,15 @@ import (
 
 type Client struct {
 	Auth
-	Config
 	Zone
+	config *Config
 }
 
-func New(config string) (client *Client, err error) {
-
-	client = &Client{
-		Auth: Auth{client: &http.Client{}},
-	}
-	if err := client.LoadFromJSON(config); err != nil {
-		return nil, errors.New("cannot load config: " + err.Error())
-	}
-
+func setup(client *Client) (*Client, error) {
 	// try loading cookies
+	var err error
 	var jar *cookiejar.Jar
-	var jarPath = client.Config.Cookies
+	var jarPath = client.config.Cookies
 	if jar, err = cookiejar.New(&cookiejar.Options{
 		PublicSuffixList: nil,
 		Filename:         jarPath,
@@ -37,4 +30,29 @@ func New(config string) (client *Client, err error) {
 
 	client.client.Jar = jar // set the cookie jar
 	return client, nil
+}
+
+//New use the default config if the path to a config.json is not specified
+func New() (client *Client, err error) {
+	client = &Client{
+		Auth: Auth{client: &http.Client{}},
+	}
+
+	client.config = &DefaultConfig
+	return setup(client)
+}
+
+//New create a bili client if the path to a config.json file is specified
+func NewWithConfig(configPath string) (client *Client, err error) {
+
+	client = &Client{
+		Auth: Auth{client: &http.Client{}},
+	}
+
+	var config *Config
+	if config, err = LoadFromJSON(configPath); err != nil {
+		return nil, errors.New("cannot load config: " + err.Error())
+	}
+	client.config = config
+	return setup(client)
 }

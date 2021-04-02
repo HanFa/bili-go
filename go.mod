@@ -1,4 +1,4 @@
-module bili
+module github.com/hanfa/bili-go
 
 go 1.15
 

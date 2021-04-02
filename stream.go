@@ -94,7 +94,7 @@ type StreamUrlResponse struct {
 }
 
 func (c *Client) getStreamUrl(request interface{}) (StreamUrlResponse, error) {
-	responseBytes, err := HttpGetWithParams(c.client, c.Endpoints.StreamGetUrl, request)
+	responseBytes, err := HttpGetWithParams(c.client, c.config.Endpoints.StreamGetUrl, request)
 	if err != nil {
 		return StreamUrlResponse{}, err
 	}

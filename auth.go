@@ -88,7 +88,7 @@ type Auth struct {
 }
 
 func (c *Client) GetCaptcha() (CaptchaGetResponse, error) {
-	responseBytes, err := HttpGet(c.client, c.Endpoints.CaptchaGetUrl)
+	responseBytes, err := HttpGet(c.client, c.config.Endpoints.CaptchaGetUrl)
 	if err != nil {
 		return CaptchaGetResponse{}, err
 	}
@@ -128,7 +128,7 @@ func (c *Client) DoCaptcha() error {
 }
 
 func (c *Client) GetPasswordSaltAndRSA() (SaltAndRsaResponse, error) {
-	responseBytes, err := HttpGet(c.client, c.Endpoints.SaltAndRsaGetUrl)
+	responseBytes, err := HttpGet(c.client, c.config.Endpoints.SaltAndRsaGetUrl)
 	if err != nil {
 		return SaltAndRsaResponse{}, err
 	}
@@ -165,10 +165,10 @@ func (c *Client) IsSessionValid() (valid bool) {
 func (c *Client) ClearSession() error {
 
 	cookiesPath := ""
-	if c.Config.Cookies == "" {
+	if c.config.Cookies == "" {
 		cookiesPath = cookiejar.DefaultCookieFile()
 	} else {
-		cookiesPath = c.Config.Cookies
+		cookiesPath = c.config.Cookies
 	}
 
 	if err := os.Remove(cookiesPath); err != nil {
@@ -220,7 +220,7 @@ func (c *Client) DoLogin(username, plain string) (LoginResponse, error) {
 		Seccode:     c.Seccode,
 	}
 
-	responseBytes, _, err := HttpPostWithParams(c.client, c.Endpoints.LoginPostUrl, request)
+	responseBytes, _, err := HttpPostWithParams(c.client, c.config.Endpoints.LoginPostUrl, request)
 	if err != nil {
 		return LoginResponse{}, err
 	}

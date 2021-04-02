@@ -8,7 +8,7 @@ import (
 var client *Client
 
 func TestMain(m *testing.M) {
-	client, _ = New("./config.json")
+	client, _ = New()
 	_ = client.ClearSession()
 	m.Run()
 }

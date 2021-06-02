@@ -33,11 +33,42 @@ func TestClient_DownloadByAid(t *testing.T) {
 			Allow4K:    true,
 			OutPath:    "/tmp/test.flv",
 		},
-	}, true)
+	}, true, nil)
 
 	assert.Nil(t, err)
 	actualMD5, _ := calculateMD5("/tmp/test.flv")
-	assert.Equal(t, "b748f8d0e3ec41cee2d016d91dcf5396", actualMD5)
+	assert.Equal(t, "7bf29f794b6b700c846363a2839120d7", actualMD5)
+	if err = os.Remove("/tmp/test.flv"); err != nil {
+		assert.Fail(t, "cannot clean up the test file")
+	}
+}
+
+type ProgressWriter struct {
+	byteNum int
+}
+
+func (pw *ProgressWriter) Write(p []byte) (n int, err error) {
+	pw.byteNum += len(p)
+	return len(p), nil
+}
+
+func TestClient_DownloadByAid_withProgressWriter(t *testing.T) {
+	pw := ProgressWriter{byteNum: 0}
+	err := client.DownloadByAid(DownloadOptionAid{
+		Aid: 713884132,
+		DownloadOptionCommon: DownloadOptionCommon{
+			Page:       0,
+			Resolution: Stream240P,
+			Mode:       StreamFlv,
+			Allow4K:    true,
+			OutPath:    "/tmp/test.flv",
+		},
+	}, true, &pw)
+
+	assert.Nil(t, err)
+	actualMD5, _ := calculateMD5("/tmp/test.flv")
+	assert.Equal(t, "7bf29f794b6b700c846363a2839120d7", actualMD5)
+	assert.Equal(t, 2514282, pw.byteNum)
 	if err = os.Remove("/tmp/test.flv"); err != nil {
 		assert.Fail(t, "cannot clean up the test file")
 	}

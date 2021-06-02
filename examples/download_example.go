@@ -26,7 +26,7 @@ func main() {
 			Allow4K:    true,
 			OutPath:    "/tmp/out.flv",
 		},
-	}, true)
+	}, true, nil)
 
 	if err != nil {
 		log.Fatalln(err.Error())

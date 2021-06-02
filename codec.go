@@ -42,7 +42,7 @@ func HttpGet(client *http.Client, endpoint string) ([]byte, error) {
 	return responseBody, err
 }
 
-func HttpGetAsFile(client *http.Client, endpoint string, path string, showProgress bool) error {
+func HttpGetAsFile(client *http.Client, endpoint string, path string, showProgress bool, progressWriter io.Writer) error {
 	tmpPath := fmt.Sprintf("%s.tmp", path)
 	out, err := os.Create(tmpPath)
 	if err != nil {
@@ -57,7 +57,11 @@ func HttpGetAsFile(client *http.Client, endpoint string, path string, showProgre
 		return errors.New("get response does not return 200")
 	}
 	progressBar := progress{showProgress, pb.StartNew(int(response.ContentLength))}
-	_, err = io.Copy(out, io.TeeReader(response.Body, &progressBar))
+	teeReader := io.TeeReader(response.Body, &progressBar)
+	if progressWriter != nil {
+		teeReader = io.TeeReader(teeReader, progressWriter)
+	}
+	_, err = io.Copy(out, teeReader)
 	progressBar.bar.Finish()
 	if err != nil {
 		return err

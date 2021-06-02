@@ -43,8 +43,23 @@ func TestClient_DownloadByAid(t *testing.T) {
 	}
 }
 
+type MyProgressWriter struct {
+	curLength   int
+	totalLength int
+}
+
+func (m *MyProgressWriter) Write(p []byte) (n int, err error) {
+	m.curLength += len(p)
+	return len(p), nil
+}
+
+func (m *MyProgressWriter) SetContentLength(contentLength int) (err error) {
+	m.totalLength = contentLength
+	return nil
+}
+
 func TestClient_DownloadByAid_withProgressWriter(t *testing.T) {
-	pw := ProgressWriter{curLength: 0}
+	pw := MyProgressWriter{}
 	err := client.DownloadByAid(DownloadOptionAid{
 		Aid: 713884132,
 		DownloadOptionCommon: DownloadOptionCommon{
@@ -60,7 +75,7 @@ func TestClient_DownloadByAid_withProgressWriter(t *testing.T) {
 	actualMD5, _ := calculateMD5("/tmp/test.flv")
 	assert.Equal(t, "7bf29f794b6b700c846363a2839120d7", actualMD5)
 	assert.Equal(t, 2514282, pw.curLength)
-	assert.Equal(t, pw.contentLength, pw.curLength)
+	assert.Equal(t, pw.totalLength, pw.curLength)
 	if err = os.Remove("/tmp/test.flv"); err != nil {
 		assert.Fail(t, "cannot clean up the test file")
 	}

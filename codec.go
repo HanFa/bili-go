@@ -42,7 +42,7 @@ func HttpGet(client *http.Client, endpoint string) ([]byte, error) {
 	return responseBody, err
 }
 
-func HttpGetAsFile(client *http.Client, endpoint string, path string, showProgress bool, progressWriter *ProgressWriter) error {
+func HttpGetAsFile(client *http.Client, endpoint string, path string, showProgress bool, progressWriter ProgressWriter) error {
 	tmpPath := fmt.Sprintf("%s.tmp", path)
 	out, err := os.Create(tmpPath)
 	if err != nil {
@@ -59,7 +59,9 @@ func HttpGetAsFile(client *http.Client, endpoint string, path string, showProgre
 	progressBar := progress{showProgress, pb.StartNew(int(response.ContentLength))}
 	teeReader := io.TeeReader(response.Body, &progressBar)
 	if progressWriter != nil {
-		progressWriter.contentLength = int(response.ContentLength)
+		if progressWriter.SetContentLength(int(response.ContentLength)) != nil {
+			return errors.New("HttpGetAsFile: cannot set content length")
+		}
 		teeReader = io.TeeReader(teeReader, progressWriter)
 	}
 	_, err = io.Copy(out, teeReader)

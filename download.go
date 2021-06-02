@@ -3,8 +3,18 @@ package bili
 import (
 	"errors"
 	"fmt"
-	"io"
 )
+
+// ProgressWriter is useful for progress report
+type ProgressWriter struct {
+	contentLength int // the total length of the video
+	curLength     int // received length
+}
+
+func (pw *ProgressWriter) Write(p []byte) (n int, err error) {
+	pw.curLength += len(p)
+	return len(p), nil
+}
 
 type DownloadOptionCommon struct {
 	Page       int
@@ -24,7 +34,7 @@ type DownloadOptionBvid struct {
 	DownloadOptionCommon
 }
 
-func (c *Client) download(streamUrlResponse StreamUrlResponse, option DownloadOptionCommon, showProgress bool, progressWriter io.Writer) error {
+func (c *Client) download(streamUrlResponse StreamUrlResponse, option DownloadOptionCommon, showProgress bool, progressWriter *ProgressWriter) error {
 	if option.Mode == StreamFlv || option.Mode == StreamLowResMp4 {
 		parts := len(streamUrlResponse.Data.Durl)
 		if parts == 0 {
@@ -52,7 +62,8 @@ func (c *Client) download(streamUrlResponse StreamUrlResponse, option DownloadOp
 	return nil
 }
 
-func (c *Client) DownloadByAid(option DownloadOptionAid, showProgress bool, progressWriter io.Writer) error {
+// DownloadByAid download video by Aid from BiliBili
+func (c *Client) DownloadByAid(option DownloadOptionAid, showProgress bool, progressWriter *ProgressWriter) error {
 	urlResponse, err := c.GetStreamUrlAvid(option.Aid, option.Page, option.Resolution, option.Mode, option.Allow4K)
 	if err != nil {
 		return err
@@ -60,7 +71,8 @@ func (c *Client) DownloadByAid(option DownloadOptionAid, showProgress bool, prog
 	return c.download(urlResponse, option.DownloadOptionCommon, showProgress, progressWriter)
 }
 
-func (c *Client) DownloadByBvid(option DownloadOptionBvid, showProgress bool, progressWriter io.Writer) error {
+// DownloadByBvid download video by Bvid from BiliBili
+func (c *Client) DownloadByBvid(option DownloadOptionBvid, showProgress bool, progressWriter *ProgressWriter) error {
 	urlResponse, err := c.GetStreamUrlBvid(option.Bvid, option.Page, option.Resolution, option.Mode, option.Allow4K)
 	if err != nil {
 		return err

@@ -62,6 +62,7 @@ const (
 	LoginTimeout                 LoginResponseCode = -662
 	LoginFieldMissing            LoginResponseCode = -2001
 	LoginPhoneNumOrEmailNeeded   LoginResponseCode = -2100
+	LoginEmailVerifiedNeed       LoginResponseCode = -2110
 	LoginWrongPrivateKey         LoginResponseCode = 2400
 	LoginWrongGeeTest            LoginResponseCode = 2406
 )

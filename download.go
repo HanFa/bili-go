@@ -11,6 +11,7 @@ type ProgressWriter interface {
 	SetContentLength(contentLength int) (err error) // set the total length of the video
 }
 
+// DownloadOptionCommon is the common part of the request payload for the video download
 type DownloadOptionCommon struct {
 	Page       int
 	Resolution StreamResolutionMode
@@ -19,16 +20,21 @@ type DownloadOptionCommon struct {
 	OutPath    string
 }
 
+// DownloadOptionAid represents a DownloadOptionCommon specified by video Aid
 type DownloadOptionAid struct {
 	Aid int
 	DownloadOptionCommon
 }
 
+// DownloadOptionBvid represents a DownloadOptionCommon specified by video Bvid
 type DownloadOptionBvid struct {
 	Bvid string
 	DownloadOptionCommon
 }
 
+// download downloads the video specified by the returned streaming url
+// the progress bar will presented in the standard output if showProgress is True
+// progressWriter provides a hook whenever the progress is updated
 func (c *Client) download(streamUrlResponse StreamUrlResponse, option DownloadOptionCommon, showProgress bool, progressWriter ProgressWriter) error {
 	if option.Mode == StreamFlv || option.Mode == StreamLowResMp4 {
 		parts := len(streamUrlResponse.Data.Durl)
@@ -57,7 +63,7 @@ func (c *Client) download(streamUrlResponse StreamUrlResponse, option DownloadOp
 	return nil
 }
 
-// DownloadByAid download video by Aid from BiliBili
+// DownloadByAid download the video specified by Aid
 func (c *Client) DownloadByAid(option DownloadOptionAid, showProgress bool, progressWriter ProgressWriter) error {
 	urlResponse, err := c.GetStreamUrlAvid(option.Aid, option.Page, option.Resolution, option.Mode, option.Allow4K)
 	if err != nil {
@@ -66,7 +72,7 @@ func (c *Client) DownloadByAid(option DownloadOptionAid, showProgress bool, prog
 	return c.download(urlResponse, option.DownloadOptionCommon, showProgress, progressWriter)
 }
 
-// DownloadByBvid download video by Bvid from BiliBili
+// DownloadByBvid download the video specified by Bvid
 func (c *Client) DownloadByBvid(option DownloadOptionBvid, showProgress bool, progressWriter ProgressWriter) error {
 	urlResponse, err := c.GetStreamUrlBvid(option.Bvid, option.Page, option.Resolution, option.Mode, option.Allow4K)
 	if err != nil {

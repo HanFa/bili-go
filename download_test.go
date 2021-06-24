@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/assert"
 )
 
+// calculateMD5 calculates the md5sum of the file pointed by the path
 func calculateMD5(path string) (string, error) {
 	f, err := os.Open(path)
 	if err != nil {

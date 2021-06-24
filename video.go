@@ -5,17 +5,20 @@ import (
 )
 
 //
-//Get video information and description
+// Get video information and description
 //
 
+// VideoRequestAid represents the request payload for the video information specified by Aid
 type VideoRequestAid struct {
 	Aid int `url:"aid"`
 }
 
+// VideoRequestBvid represents the request payload for the video information specified by Bvid
 type VideoRequestBvid struct {
 	Bvid string `url:"bvid"`
 }
 
+// VideoResponseCode is the status code of the response for fetching the video information
 type VideoResponseCode int
 
 const (
@@ -26,13 +29,17 @@ const (
 	VideoNotVisible   VideoResponseCode = 62002
 )
 
+// VideoState is the state of the retrieved video information
 type VideoState int
+
+// VideoDimension is the dimension for the 1P video
 type VideoDimension struct {
 	Width  int `json:"width"`
 	Height int `json:"height"`
 	Rotate int `json:"rotate"`
 }
 
+// VideoInfoResponse represents the retrieved video information
 type VideoInfoResponse struct {
 	Code    VideoResponseCode `json:"code"`
 	Message string            `json:"message"`
@@ -117,6 +124,7 @@ type VideoInfoResponse struct {
 	} `json:"data"`
 }
 
+// VideoDescResponse represents the response of the retrieved video description
 type VideoDescResponse struct {
 	Code    VideoResponseCode `json:"code"`
 	Message string            `json:"message"`
@@ -124,6 +132,7 @@ type VideoDescResponse struct {
 	Data    string            `json:"data"`
 }
 
+// getVideoInfo retrieves the video information
 func (c *Client) getVideoInfo(request interface{}) (VideoInfoResponse, error) {
 	responseBytes, err := HttpGetWithParams(c.client, c.config.Endpoints.VideoViewUrl, request)
 	if err != nil {
@@ -136,14 +145,17 @@ func (c *Client) getVideoInfo(request interface{}) (VideoInfoResponse, error) {
 	return response, nil
 }
 
+// GetVideoInfoByAid retrieves the video information specified by the Aid
 func (c *Client) GetVideoInfoByAid(aid int) (VideoInfoResponse, error) {
 	return c.getVideoInfo(VideoRequestAid{Aid: aid})
 }
 
+// GetVideoInfoByBvid retrieves the video information specified by the Bvid
 func (c *Client) GetVideoInfoByBvid(bvid string) (VideoInfoResponse, error) {
 	return c.getVideoInfo(VideoRequestBvid{Bvid: bvid})
 }
 
+// getVideoDescription retrieves the video description
 func (c *Client) getVideoDescription(request interface{}) (VideoDescResponse, error) {
 	responseBytes, err := HttpGetWithParams(c.client, c.config.Endpoints.VideoDescUrl, request)
 	if err != nil {
@@ -156,18 +168,21 @@ func (c *Client) getVideoDescription(request interface{}) (VideoDescResponse, er
 	return response, nil
 }
 
+// GetVideoDescriptionByAid retrieves the video description specified by the Aid
 func (c *Client) GetVideoDescriptionByAid(aid int) (VideoDescResponse, error) {
 	return c.getVideoDescription(VideoRequestAid{Aid: aid})
 }
 
+// GetVideoDescriptionByBvid retrieves the video description specified by the Bvid
 func (c *Client) GetVideoDescriptionByBvid(bvid string) (VideoDescResponse, error) {
 	return c.getVideoDescription(VideoRequestBvid{Bvid: bvid})
 }
 
 //
-//Like/Unlike a video
+// Like/Unlike a video
 //
 
+// LikeUnlikeOpCode is the operation code for Like/Unlike. 1 for like and 2 for unlike
 type LikeUnlikeOpCode int
 
 const (
@@ -175,18 +190,21 @@ const (
 	VideoUnlike LikeUnlikeOpCode = 2
 )
 
+// VideoLikeRequestAid is the like/unlike request to video specified by the Aid
 type VideoLikeRequestAid struct {
 	Aid  int              `url:"aid"`
 	Like LikeUnlikeOpCode `url:"like"`
 	Csrf string           `url:"csrf"`
 }
 
+// VideoLikeRequestBvid is the like/unlike request to video specified by the Bvid
 type VideoLikeRequestBvid struct {
 	Bvid string           `url:"bvid"`
 	Like LikeUnlikeOpCode `url:"like"`
 	Csrf string           `url:"csrf"`
 }
 
+// VideoLikeResponseCode is the status code for the like/unlike response
 type VideoLikeResponseCode int
 
 const (
@@ -199,12 +217,14 @@ const (
 	VideoLikeDuplicateLikes VideoLikeResponseCode = 65006
 )
 
+// VideoLikeResponse is the response for like/unlike a video
 type VideoLikeResponse struct {
 	Code    VideoLikeResponseCode `json:"code"`
 	Message string                `json:"message"`
 	Ttl     int                   `json:"ttl"`
 }
 
+// likeVideo likes or unlikes a video
 func (c *Client) likeVideo(request interface{}) (VideoLikeResponse, error) {
 	responseBody, _, err := HttpPostWithParams(c.client, c.config.Endpoints.VideoLikeUrl, request)
 	if err != nil {
@@ -217,6 +237,7 @@ func (c *Client) likeVideo(request interface{}) (VideoLikeResponse, error) {
 	return response, nil
 }
 
+// LikeVideoByAid likes or unlikes a video specified by Aid
 func (c *Client) LikeVideoByAid(aid int, like LikeUnlikeOpCode) (VideoLikeResponse, error) {
 	csrf, err := c.getCookieValueByName("bili_jct")
 	if err != nil {
@@ -229,6 +250,7 @@ func (c *Client) LikeVideoByAid(aid int, like LikeUnlikeOpCode) (VideoLikeRespon
 	})
 }
 
+// LikeVideoByBvid likes or unlikes a video specified by Bvid
 func (c *Client) LikeVideoByBvid(bvid string, like LikeUnlikeOpCode) (VideoLikeResponse, error) {
 	csrf, err := c.getCookieValueByName("bili_jct")
 	if err != nil {
@@ -242,9 +264,10 @@ func (c *Client) LikeVideoByBvid(bvid string, like LikeUnlikeOpCode) (VideoLikeR
 }
 
 //
-//Check a video has like or not
+// Check a video has like or not
 //
 
+// LikeUnlikeStatusCode is the status code of a like/unlike operation
 type LikeUnlikeStatusCode int
 
 const (
@@ -252,6 +275,7 @@ const (
 	Liked   LikeUnlikeStatusCode = 1
 )
 
+// VideoHasLikeResponse is the response of checking if the logged in user has liked a video or not
 type VideoHasLikeResponse struct {
 	Code    VideoLikeResponseCode `json:"code"`
 	Message string                `json:"message"`
@@ -259,6 +283,7 @@ type VideoHasLikeResponse struct {
 	Data    LikeUnlikeStatusCode  `json:"data"`
 }
 
+// checkVideoLike checks if the logged in user has liked a video or not
 func (c *Client) checkVideoLike(request interface{}) (VideoHasLikeResponse, error) {
 	responseBody, err := HttpGetWithParams(c.client, c.config.Endpoints.VideoCheckLikeUrl, request)
 	if err != nil {
@@ -271,18 +296,21 @@ func (c *Client) checkVideoLike(request interface{}) (VideoHasLikeResponse, erro
 	return response, nil
 }
 
+// CheckVideoLikeByAid checks if the logged in user has liked a video or not specified by Aid
 func (c *Client) CheckVideoLikeByAid(aid int) (VideoHasLikeResponse, error) {
 	return c.checkVideoLike(VideoRequestAid{Aid: aid})
 }
 
+// CheckVideoLikeByBvid checks if the logged in user has liked a video or not specified by Bvid
 func (c *Client) CheckVideoLikeByBvid(bvid string) (VideoHasLikeResponse, error) {
 	return c.checkVideoLike(VideoRequestBvid{Bvid: bvid})
 }
 
 //
-//Add coin to the video
+// Add coin to the video
 //
 
+// VideoAddCoinRequestAid is a request payload to add coin to a video specified by Aid
 type VideoAddCoinRequestAid struct {
 	Aid        int    `url:"aid"`
 	Multiply   int    `url:"multiply"`
@@ -290,6 +318,7 @@ type VideoAddCoinRequestAid struct {
 	Csrf       string `url:"csrf"`
 }
 
+// VideoAddCoinRequestBvid is a request payload to add coin to a video specified by Bvid
 type VideoAddCoinRequestBvid struct {
 	Bvid       string `url:"bvid"`
 	Multiply   int    `url:"multiply"`
@@ -297,6 +326,7 @@ type VideoAddCoinRequestBvid struct {
 	Csrf       string `url:"csrf"`
 }
 
+// VideoAddCoinResponseCode is the status code of the response for adding coin to a video
 type VideoAddCoinResponseCode int
 
 const (
@@ -313,6 +343,7 @@ const (
 	VideoAddCoinBeyondLimit       VideoAddCoinResponseCode = 34005
 )
 
+// VideoAddCoinResponse is the response for adding coin to a video
 type VideoAddCoinResponse struct {
 	Code    VideoAddCoinResponseCode `json:"code"`
 	Message string                   `json:"message"`
@@ -320,6 +351,7 @@ type VideoAddCoinResponse struct {
 	Data    interface{}              `json:"data"`
 }
 
+// addCoinToVideo adds a coin to a video
 func (c *Client) addCoinToVideo(request interface{}) (VideoAddCoinResponse, error) {
 	responseBody, _, err := HttpPostWithParams(c.client, c.config.Endpoints.VideoAddCoinUrl, request)
 	if err != nil {
@@ -332,6 +364,7 @@ func (c *Client) addCoinToVideo(request interface{}) (VideoAddCoinResponse, erro
 	return response, nil
 }
 
+// AddCoinToVideoByAid adds a coin to a video specified by Aid
 func (c *Client) AddCoinToVideoByAid(aid int, multiply int, likeAsWell bool) (VideoAddCoinResponse, error) {
 	selectLike := 0
 	if likeAsWell {
@@ -349,6 +382,7 @@ func (c *Client) AddCoinToVideoByAid(aid int, multiply int, likeAsWell bool) (Vi
 	})
 }
 
+// AddCoinToVideoByBvid adds a coin to a video specified by Bvid
 func (c *Client) AddCoinToVideoByBvid(bvid string, multiply int, likeAsWell bool) (VideoAddCoinResponse, error) {
 	selectLike := 0
 	if likeAsWell {
@@ -367,9 +401,10 @@ func (c *Client) AddCoinToVideoByBvid(bvid string, multiply int, likeAsWell bool
 }
 
 //
-//Check a video has received coins from you or not
+// Check a video has received coins from you or not
 //
 
+// VideoHasCoinsResponse is the response of checking if the logged-in user has sent coins to this video
 type VideoHasCoinsResponse struct {
 	Code    VideoAddCoinResponseCode `json:"code"`
 	Message string                   `json:"message"`
@@ -379,6 +414,7 @@ type VideoHasCoinsResponse struct {
 	} `json:"data"`
 }
 
+// checkVideoHasCoins checks if the logged-in user has sent coins to this video
 func (c *Client) checkVideoHasCoins(request interface{}) (VideoHasCoinsResponse, error) {
 	responseBody, err := HttpGetWithParams(c.client, c.config.Endpoints.VideoCheckHasCoinUrl, request)
 	if err != nil {
@@ -391,18 +427,21 @@ func (c *Client) checkVideoHasCoins(request interface{}) (VideoHasCoinsResponse,
 	return response, nil
 }
 
+// CheckVideoHasCoinsByAid checks if the logged-in user has sent coins to this video specified by the Aid
 func (c *Client) CheckVideoHasCoinsByAid(aid int) (VideoHasCoinsResponse, error) {
 	return c.checkVideoHasCoins(VideoRequestAid{Aid: aid})
 }
 
+// CheckVideoHasCoinsByBvid checks if the logged-in user has sent coins to this video specified by the Bvid
 func (c *Client) CheckVideoHasCoinsByBvid(bvid string) (VideoHasCoinsResponse, error) {
 	return c.checkVideoHasCoins(VideoRequestBvid{Bvid: bvid})
 }
 
 //
-//Change (add/remove) video to/from the favorite list
+// Change (add/remove) video to/from the favorite list (收藏)
 //
 
+// VideoChangeFavRequest is the request payload of changing the favorite status of the video specified by Aid
 type VideoChangeFavRequest struct {
 	Aid         int    `url:"rid"`
 	Type        int    `url:"type"`
@@ -412,6 +451,7 @@ type VideoChangeFavRequest struct {
 	Jsonp       string `url:"jsonp"`
 }
 
+// VideoChangeFavResponseCode is the status code of the response for changing the favorite status of the video
 type VideoChangeFavResponseCode int
 
 const (
@@ -426,6 +466,7 @@ const (
 	VideoChangeFavIncorrectArgs  VideoChangeFavResponseCode = 72010017
 )
 
+// VideoChangeFavResponse is the response for changing the favorite status of the video
 type VideoChangeFavResponse struct {
 	Code    VideoChangeFavResponseCode `json:"code"`
 	Message string                     `json:"message"`
@@ -434,6 +475,7 @@ type VideoChangeFavResponse struct {
 	}
 }
 
+// changeVideoFav changes the favorite status of the video
 func (c *Client) changeVideoFav(request interface{}) (VideoChangeFavResponse, error) {
 	responseBody, _, err := HttpPostWithParamsReferer(c.client, c.config.Endpoints.VideoChangeFavUrl, request, "https://www.bilibili.com/")
 	if err != nil {
@@ -446,6 +488,7 @@ func (c *Client) changeVideoFav(request interface{}) (VideoChangeFavResponse, er
 	return response, nil
 }
 
+// ChangeVideoFavByAid changes the favorite status of the video specified by Aid
 func (c *Client) ChangeVideoFavByAid(aid int, addMedias []int, delMedias []int) (VideoChangeFavResponse, error) {
 	csrf, err := c.getCookieValueByName("bili_jct")
 	if err != nil {
@@ -465,6 +508,7 @@ func (c *Client) ChangeVideoFavByAid(aid int, addMedias []int, delMedias []int) 
 // Check if the video has been favored or not
 //
 
+// VideoFavoredResponse is the response for checking if a video has been favored by the logged-in user
 type VideoFavoredResponse struct {
 	Code    VideoChangeFavResponseCode `json:"code"`
 	Message string                     `json:"message"`
@@ -474,6 +518,7 @@ type VideoFavoredResponse struct {
 	} `json:"data"`
 }
 
+// checkVideoFavored checks if a video has been favored by the logged-in user
 func (c *Client) checkVideoFavored(request interface{}) (VideoFavoredResponse, error) {
 	responseBody, err := HttpGetWithParams(c.client, c.config.Endpoints.VideoCheckHasCoinUrl, request)
 	if err != nil {
@@ -486,10 +531,12 @@ func (c *Client) checkVideoFavored(request interface{}) (VideoFavoredResponse, e
 	return response, nil
 }
 
+// CheckVideoFavoredByAid checks if a video has been favored by the logged-in user specified by Aid
 func (c *Client) CheckVideoFavoredByAid(aid int) (VideoFavoredResponse, error) {
 	return c.checkVideoFavored(VideoRequestAid{Aid: aid})
 }
 
+// CheckVideoFavoredByBvid checks if a video has been favored by the logged-in user specified by Bvid
 func (c *Client) CheckVideoFavoredByBvid(bvid string) (VideoFavoredResponse, error) {
 	return c.checkVideoFavored(VideoRequestBvid{Bvid: bvid})
 }

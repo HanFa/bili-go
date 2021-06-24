@@ -6,6 +6,7 @@ import (
 	"os"
 )
 
+// ConfigEndpoints is a part of Config that specifies the endpoints
 type ConfigEndpoints struct {
 	BaseUrl              string `json:"base_url"`
 	CaptchaGetUrl        string `json:"captcha_get_url"`
@@ -22,12 +23,17 @@ type ConfigEndpoints struct {
 	StreamGetUrl         string `json:"stream_get_url"`
 }
 
+// Config specifies the expected type of configuration
+// used by the bili-go APIs
 type Config struct {
 	Cookies   string          `json:"cookies"`
 	Endpoints ConfigEndpoints `json:"endpoints"`
 }
 
-var DefaultConfig Config = Config{
+// DefaultConfig is the default configuration for the bili-go APIs
+// it specifies the cookies path for the authentication persistent
+// as well as the endpoints for the APIs
+var DefaultConfig = Config{
 	Cookies: "./.bili-cookies",
 	Endpoints: ConfigEndpoints{BaseUrl: "http://bilibili.com",
 		CaptchaGetUrl:        "http://passport.bilibili.com/web/captcha/combine?plat=6",
@@ -44,6 +50,7 @@ var DefaultConfig Config = Config{
 		StreamGetUrl:         "http://api.bilibili.com/x/player/playurl"},
 }
 
+// LoadFromJSON reads in the file pointed by path into Config
 func LoadFromJSON(path string) (*Config, error) {
 	config := new(Config)
 	jsonFile, err := os.Open(path)

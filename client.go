@@ -6,6 +6,7 @@ import (
 	"net/http"
 )
 
+// Client represents a client for the bili-go APIs
 type Client struct {
 	Auth
 	Zone
@@ -32,7 +33,7 @@ func setup(client *Client) (*Client, error) {
 	return client, nil
 }
 
-//New use the default config if the path to a config.json is not specified
+// New use the DefaultConfig if the path to a config.json is not specified
 func New() (client *Client, err error) {
 	client = &Client{
 		Auth: Auth{client: &http.Client{}},
@@ -42,7 +43,7 @@ func New() (client *Client, err error) {
 	return setup(client)
 }
 
-//New create a bili client if the path to a config.json file is specified
+// NewWithConfig create a bili client if the path to a config.json file is specified
 func NewWithConfig(configPath string) (client *Client, err error) {
 
 	client = &Client{

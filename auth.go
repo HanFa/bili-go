@@ -9,12 +9,13 @@ import (
 	"encoding/json"
 	"encoding/pem"
 	"errors"
-	cookiejar "github.com/juju/persistent-cookiejar"
 	"log"
 	"net/http"
 	"net/url"
 	"os"
 	"strings"
+
+	cookiejar "github.com/juju/persistent-cookiejar"
 )
 
 type CaptchaResponseCode int
@@ -88,6 +89,7 @@ type Auth struct {
 	client *http.Client
 }
 
+// GetCaptcha retrieves the captcha content from Bilibili for DoCaptcha
 func (c *Client) GetCaptcha() (CaptchaGetResponse, error) {
 	responseBytes, err := HttpGet(c.client, c.config.Endpoints.CaptchaGetUrl)
 	if err != nil {
@@ -100,6 +102,7 @@ func (c *Client) GetCaptcha() (CaptchaGetResponse, error) {
 	return response, nil
 }
 
+// DoCaptcha verifies the human interaction provided by https://kuresaru.github.io/geetest-validator/
 func (c *Client) DoCaptcha() error {
 	response, err := c.GetCaptcha()
 	if err != nil {
@@ -183,6 +186,8 @@ func (c *Client) ClearSession() error {
 	return nil
 }
 
+// Login logins the user if the session is invalid or expired using the DoLogin
+// provided with the username and plain password
 func (c *Client) Login(username, plain string) (LoginResponse, error) {
 	if !c.IsSessionValid() {
 		return c.DoLogin(username, plain)
@@ -195,6 +200,8 @@ func (c *Client) Login(username, plain string) (LoginResponse, error) {
 	}, nil
 }
 
+// DoLogin will interactively prompt the captcha verification by calling DoCaptcha,
+// after that it logins with the provided with the username and plain password.
 func (c *Client) DoLogin(username, plain string) (LoginResponse, error) {
 	err := c.DoCaptcha()
 	if err != nil {

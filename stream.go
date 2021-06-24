@@ -6,14 +6,17 @@ import (
 	"fmt"
 )
 
+// StreamMode specifies the mode of streaming either flv, low-res mp4 or dash
 type StreamMode int
 
+// List of supported StreamMode
 const (
 	StreamFlv       = 0
 	StreamLowResMp4 = 1
 	StreamDash      = 16
 )
 
+// StreamResolutionMode specifies the resolution of the streaming
 type StreamResolutionMode int
 
 const (
@@ -34,23 +37,27 @@ const (
 	StreamAudio192K StreamResolutionMode = 30280
 )
 
-type StreamUrlRequest struct {
+// streamUrlRequest represents a request payload to retrieve stream url
+type streamUrlRequest struct {
 	Cid        int                  `url:"cid"`
 	Resolution StreamResolutionMode `url:"qn"`
 	Mode       StreamMode           `url:"fnval"`
 	Allow4K    int                  `url:"fourk"`
 }
 
-type StreamUrlRequestAid struct {
+// streamUrlRequestAid represents a streamUrlRequest specified by video Aid
+type streamUrlRequestAid struct {
 	Avid int `url:"avid"`
-	StreamUrlRequest
+	streamUrlRequest
 }
 
-type StreamUrlRequestBvid struct {
+// streamUrlRequestBvid represents a streamUrlRequest specified by video Bvid
+type streamUrlRequestBvid struct {
 	Bvid string `url:"bvid"`
-	StreamUrlRequest
+	streamUrlRequest
 }
 
+// StreamUrlResponseCode represents the status code of retrieving stream URL response
 type StreamUrlResponseCode int
 
 const (
@@ -59,6 +66,7 @@ const (
 	StreamUrlVideoNotExists = -404
 )
 
+// StreamDashInfo represents the dash information of the retrieved stream
 type StreamDashInfo struct {
 	Id        StreamResolutionMode `json:"id"`
 	BaseUrl   string               `json:"base_url"`
@@ -71,6 +79,7 @@ type StreamDashInfo struct {
 	FrameRate string               `json:"frame_rate"`
 }
 
+// StreamUrlResponse represents the response payload of the stream url retrieval
 type StreamUrlResponse struct {
 	Code    StreamUrlResponseCode `json:"code"`
 	Message string                `json:"message"`
@@ -93,6 +102,7 @@ type StreamUrlResponse struct {
 	} `json:"data"`
 }
 
+// getStreamUrl retrieves the stream url with the request payload
 func (c *Client) getStreamUrl(request interface{}) (StreamUrlResponse, error) {
 	responseBytes, err := HttpGetWithParams(c.client, c.config.Endpoints.StreamGetUrl, request)
 	if err != nil {
@@ -113,6 +123,7 @@ func boolToInt(b bool) int {
 	return res
 }
 
+// GetStreamUrlAvid retrieves the stream url with the specified Avid
 func (c *Client) GetStreamUrlAvid(aid int, page int, resolution StreamResolutionMode,
 	mode StreamMode, allow4K bool) (StreamUrlResponse, error) {
 	info, err := c.GetVideoInfoByAid(aid)
@@ -125,9 +136,9 @@ func (c *Client) GetStreamUrlAvid(aid int, page int, resolution StreamResolution
 			errors.New(fmt.Sprintf("Invalid page num %d, this video has %d page", page, len(pages)))
 	}
 	cid := pages[page].Cid
-	return c.getStreamUrl(StreamUrlRequestAid{
+	return c.getStreamUrl(streamUrlRequestAid{
 		Avid: aid,
-		StreamUrlRequest: StreamUrlRequest{
+		streamUrlRequest: streamUrlRequest{
 			Cid:        cid,
 			Resolution: resolution,
 			Mode:       mode,
@@ -136,6 +147,7 @@ func (c *Client) GetStreamUrlAvid(aid int, page int, resolution StreamResolution
 	})
 }
 
+// GetStreamUrlBvid retrieves the stream url with the specified Bvid
 func (c *Client) GetStreamUrlBvid(bvid string, page int, resolution StreamResolutionMode,
 	mode StreamMode, allow4K bool) (StreamUrlResponse, error) {
 	info, err := c.GetVideoInfoByBvid(bvid)
@@ -148,9 +160,9 @@ func (c *Client) GetStreamUrlBvid(bvid string, page int, resolution StreamResolu
 			errors.New(fmt.Sprintf("Invalid page num %d, this video has %d page", page, len(pages)))
 	}
 	cid := pages[page].Cid
-	return c.getStreamUrl(StreamUrlRequestBvid{
+	return c.getStreamUrl(streamUrlRequestBvid{
 		Bvid: bvid,
-		StreamUrlRequest: StreamUrlRequest{
+		streamUrlRequest: streamUrlRequest{
 			Cid:        cid,
 			Resolution: resolution,
 			Mode:       mode,
